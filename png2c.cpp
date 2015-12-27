@@ -30,12 +30,14 @@ unsigned short pixels[] = {
 
 void writeHeader( FILE* f, char* _symbolNameBase, SDL_Surface* image )
 {
-	fprintf( f, "#include \"Image.h\"\n\n" );
+	fprintf( f, "#include \"Types.h\"\n" );
+	fprintf( f, "#include \"Image.h\"\n" );
+	fprintf( f, "\n" );
 }
 
 void writePixels( FILE* f, char* _symbolNameBase, SDL_Surface* image )
 {
-	fprintf( f, "unsigned short %s_pixels[] =\n{\n", _symbolNameBase );
+	fprintf( f, "uint16 %s_pixels[] =\n{\n", _symbolNameBase );
 
 	unsigned char* pixels = (unsigned char*)image->pixels;
 	int x, y;
@@ -64,7 +66,7 @@ void writePixels( FILE* f, char* _symbolNameBase, SDL_Surface* image )
 
 void writeAlpha( FILE* f, char* _symbolNameBase, SDL_Surface* image )
 {
-	fprintf( f, "unsigned char %s_alpha[] =\n{\n", _symbolNameBase );
+	fprintf( f, "uint8 %s_alpha[] =\n{\n", _symbolNameBase );
 	
 	unsigned char* pixels = (unsigned char*)image->pixels;
 	int x, y;
@@ -87,12 +89,12 @@ void writeImage( FILE* f, char* _symbolNameBase, SDL_Surface* _image )
 {
 	fprintf( f, "Image %s =\n{\n", _symbolNameBase );
 	fprintf( f, "\t%i,%i,\n", _image->w, _image->h );
-	fprintf( f, "\t(unsigned short*)&%s_pixels,\n", _symbolNameBase );
+	fprintf( f, "\t(uint16*)&%s_pixels,\n", _symbolNameBase );
 	if( SDL_ISPIXELFORMAT_ALPHA( _image->format->format ))
-		fprintf( f, "\t(unsigned char*)&%s_alpha,\n", _symbolNameBase );
+		fprintf( f, "\t(uint8*)&%s_alpha,\n", _symbolNameBase );
 	else
-		fprintf( f, "\t(unsigned char*)0,\n" );
-	fprintf( f, "\t(unsigned char*)\"%s\",\n", _symbolNameBase );
+		fprintf( f, "\t(uint8*)0,\n" );
+	fprintf( f, "\t(uint8*)\"%s\",\n", _symbolNameBase );
 	
 	/*
 	 
