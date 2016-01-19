@@ -10,7 +10,12 @@ CFILES=png2c.cpp
 
 OBJS=$(CFILES:.cpp=.o)
 
-all: png2c.o
+all: build install
+
+install: build
+	sudo cp png2c /usr/local/bin
+
+build: png2c.o
 	$(LD) $(LDFLAGS) -o png2c $(LIBS) $^
 
 %.o: %.cpp
