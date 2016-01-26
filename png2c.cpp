@@ -35,7 +35,7 @@ void writeHeader( FILE* f, char* _symbolNameBase, SDL_Surface* image )
 	fprintf( f, "\n" );
 }
 
-void writePixels( FILE* f, char* _symbolNameBase, SDL_Surface* image )
+void writePixels( FILE* f, char* _symbolNameBase, SDL_Surface* image, int* _pTotalOutputSize )
 {
 	fprintf( f, "const uint16 %s_pixels[] =\n{\n", _symbolNameBase );
 
@@ -61,10 +61,12 @@ void writePixels( FILE* f, char* _symbolNameBase, SDL_Surface* image )
 		fprintf( f, "\n" );
 	}
 	
+	*_pTotalOutputSize += image->w*image->h*2;
+	
 	fprintf( f, "};\n\n" );
 }
 
-void writeAlpha( FILE* f, char* _symbolNameBase, SDL_Surface* image )
+void writeAlpha( FILE* f, char* _symbolNameBase, SDL_Surface* image, int* _pTotalOutputSize )
 {
 	fprintf( f, "const uint8 %s_alpha[] =\n{\n", _symbolNameBase );
 	
@@ -82,10 +84,12 @@ void writeAlpha( FILE* f, char* _symbolNameBase, SDL_Surface* image )
 		fprintf( f, "\n" );
 	}
 	
+	*_pTotalOutputSize += image->w*image->h;
+	
 	fprintf( f, "};\n\n" );
 }
 
-void writeImage( FILE* f, char* _symbolNameBase, SDL_Surface* _image )
+void writeImage( FILE* f, char* _symbolNameBase, SDL_Surface* _image, int* _pTotalOutputSize )
 {
 	fprintf( f, "extern \"C\" const Image %s;\n", _symbolNameBase );
 	fprintf( f, "const Image %s =\n{\n", _symbolNameBase );
@@ -132,11 +136,11 @@ void writeHeaderFile( FILE* f, char* _symbolNameBase, SDL_Surface* _image )
 SDL_Surface* LoadImage( char* _fileName )
 {
 	SDL_Surface* image = IMG_Load( _fileName );
-	printf("Image=0x%016llx\n", (long long)image );
+	//printf("Image=0x%016llx\n", (long long)image );
 	bool isAlpha = SDL_ISPIXELFORMAT_ALPHA( image->format->format );
 	bool isIndexed = SDL_ISPIXELFORMAT_INDEXED( image->format->format );
 
-	printf("w=%i, h=%i, bpp=%i, format=%i, isAlpha=%s, isIndexed=%s\n", image->w, image->h, image->format->BitsPerPixel, image->format->format, isAlpha?"Yes":"No", isIndexed?"Yes":"No" );
+	//printf("w=%i, h=%i, bpp=%i, format=%i, isAlpha=%s, isIndexed=%s\n", image->w, image->h, image->format->BitsPerPixel, image->format->format, isAlpha?"Yes":"No", isIndexed?"Yes":"No" );
 	
 	return image;
 }
@@ -180,11 +184,12 @@ int main( int _numargs, char** _apszArgh )
 	//
 	FILE* f = openOutfileC( pszOutFilenameBase );
 
+	int totalOutputSize = 0;
 	writeHeader( f, pszSymbolNameBase, image );
-	writePixels( f, pszSymbolNameBase, image );
+	writePixels( f, pszSymbolNameBase, image, &totalOutputSize );
 	if( SDL_ISPIXELFORMAT_ALPHA( image->format->format ))
-		writeAlpha( f, pszSymbolNameBase, image );
-	writeImage( f, pszSymbolNameBase, image );
+		writeAlpha( f, pszSymbolNameBase, image, &totalOutputSize );
+	writeImage( f, pszSymbolNameBase, image, &totalOutputSize );
 	
 	fclose( f );
 	
@@ -195,6 +200,7 @@ int main( int _numargs, char** _apszArgh )
 	f = openOutfileH( pszOutFilenameBase );
 	writeHeaderFile( f, pszSymbolNameBase, image );
 	fclose( f );
-	
+
+	printf("Total output size: %i\n", totalOutputSize );
 	return 0;
 }
