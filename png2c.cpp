@@ -30,8 +30,8 @@ unsigned short pixels[] = {
 
 void writeHeader( FILE* f, char* _symbolNameBase, SDL_Surface* image )
 {
-	fprintf( f, "#include \"Types.h\"\n" );
-	fprintf( f, "#include \"Image.h\"\n" );
+	fprintf( f, "#include \"Engine/Types.h\"\n" );
+	fprintf( f, "#include \"Engine/Graphics/Image.h\"\n" );
 	fprintf( f, "\n" );
 }
 
